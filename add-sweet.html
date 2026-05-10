@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shto Ëmbëlsirë</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--bg:#fdf6ee;--card:#fff8f2;--accent:#c0392b;--accent2:#e67e22;--text:#2c1a0e;--muted:#9e7b5e;--border:#f0dbc8}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+    header{background:var(--accent);color:white;padding:24px 32px;display:flex;align-items:center;gap:14px}
+    header a{color:white;text-decoration:none;font-size:1.3rem}
+    header h1{font-family:'Playfair Display',serif;font-size:1.6rem}
+    .container{max-width:580px;margin:44px auto;padding:0 20px}
+    .card{background:var(--card);border-radius:20px;padding:36px;box-shadow:0 4px 24px rgba(192,57,43,0.08)}
+    .card h2{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--accent);margin-bottom:26px}
+    .fg{margin-bottom:18px}
+    label{display:block;font-size:0.85rem;font-weight:500;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px}
+    input,select,textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.92rem;background:white;color:var(--text);transition:border 0.2s}
+    input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
+    textarea{resize:vertical;min-height:76px}
+    .btn{width:100%;background:var(--accent);color:white;border:none;padding:13px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.97rem;font-weight:500;cursor:pointer;margin-top:6px;transition:background 0.2s}
+    .btn:hover{background:#a93226}
+    .success{background:#d5f5e3;color:#1e8449;padding:11px 14px;border-radius:8px;margin-top:14px;display:none}
+    .error{background:#fadbd8;color:var(--accent);padding:11px 14px;border-radius:8px;margin-top:14px;display:none}
+  </style>
+</head>
+<body>
+  <header><a href="index.html">←</a><h1>🍰 Shto Ëmbëlsirë</h1></header>
+  <div class="container">
+    <div class="card">
+      <h2>Ëmbëlsirë e Re</h2>
+      <div class="fg"><label>Emri</label><input type="text" id="name" placeholder="p.sh. Tiramisu"/></div>
+      <div class="fg"><label>Kategoria</label>
+        <select id="category">
+          <option value="">-- Zgjidhni --</option>
+          <option>Kek</option><option>Pastiçeri</option><option>Pastë</option>
+          <option>Akullore</option><option>Çokollatë</option><option>Tjetër</option>
+        </select>
+      </div>
+      <div class="fg"><label>Çmimi (Lekë)</label><input type="number" id="price" placeholder="250" min="0"/></div>
+      <div class="fg"><label>Stoku</label><input type="number" id="stock" placeholder="30" min="0"/></div>
+      <div class="fg"><label>Përshkrimi</label><textarea id="description" placeholder="Shkruaj një përshkrim..."></textarea></div>
+      <button class="btn" onclick="add()">✅ Shto Ëmbëlsirën</button>
+      <div class="success" id="ok">✔️ U shtua! <a href="index.html">Kthehu te lista</a></div>
+      <div class="error" id="err">⚠️ Gabim. Plotëso të gjitha fushat.</div>
+    </div>
+  </div>
+  <script src="scripts/config.js"></script>
+  <script>
+    async function add() {
+      const body = {
+        name: document.getElementById('name').value.trim(),
+        category: document.getElementById('category').value,
+        price: parseFloat(document.getElementById('price').value),
+        stock: parseInt(document.getElementById('stock').value),
+        description: document.getElementById('description').value.trim()
+      };
+      if (!body.name || !body.category || isNaN(body.price) || isNaN(body.stock)) {
+        document.getElementById('err').style.display='block'; return;
+      }
+      try {
+        const res = await fetch(`${API_URL}/api/sweets`, {
+          method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)
+        });
+        if (res.ok) { document.getElementById('ok').style.display='block'; document.getElementById('err').style.display='none'; }
+        else throw new Error();
+      } catch { document.getElementById('err').style.display='block'; }
+    }
+  </script>
+</body>
+</html>

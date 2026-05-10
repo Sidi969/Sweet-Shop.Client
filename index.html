@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dyqan Ëmbëlsirash</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root { --bg:#fdf6ee;--card:#fff8f2;--accent:#c0392b;--accent2:#e67e22;--text:#2c1a0e;--muted:#9e7b5e;--border:#f0dbc8;--shadow:0 4px 24px rgba(192,57,43,0.08); }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+    header{background:var(--accent);color:white;padding:24px 32px;display:flex;align-items:center;justify-content:space-between}
+    header h1{font-family:'Playfair Display',serif;font-size:1.8rem}
+    .container{max-width:1100px;margin:36px auto;padding:0 20px}
+    .top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+    .top-bar h2{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--accent)}
+    .btn{background:var(--accent);color:white;border:none;padding:11px 22px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.92rem;font-weight:500;cursor:pointer;text-decoration:none;display:inline-block;transition:background 0.2s}
+    .btn:hover{background:#a93226}
+    .btn-edit{background:var(--accent2);padding:6px 14px;font-size:0.82rem;margin-right:5px}
+    .btn-edit:hover{background:#cf6d17}
+    .btn-del{background:transparent;color:var(--accent);border:1.5px solid var(--accent);padding:6px 14px;font-size:0.82rem}
+    .btn-del:hover{background:var(--accent);color:white}
+    table{width:100%;background:var(--card);border-radius:16px;box-shadow:var(--shadow);border-collapse:collapse;overflow:hidden}
+    thead tr{background:var(--accent);color:white}
+    th{padding:14px 18px;text-align:left;font-weight:500;font-size:0.88rem}
+    td{padding:13px 18px;border-bottom:1px solid var(--border);font-size:0.9rem}
+    tr:last-child td{border-bottom:none}
+    tbody tr:hover{background:#fff3ea}
+    .badge{background:#fdebd0;color:var(--accent2);border-radius:20px;padding:3px 10px;font-size:0.8rem;font-weight:500}
+    .price{font-weight:600;color:var(--accent)}
+    .msg{text-align:center;padding:60px;color:var(--muted);font-size:1rem}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🍰 Dyqan Ëmbëlsirash</h1>
+    <span style="font-size:1.8rem">✨</span>
+  </header>
+  <div class="container">
+    <div class="top-bar">
+      <h2>Lista e Ëmbëlsirave</h2>
+      <a href="add-sweet.html" class="btn">+ Shto Ëmbëlsirë</a>
+    </div>
+    <div id="content"><p class="msg">Duke ngarkuar...</p></div>
+  </div>
+  <script src="scripts/config.js"></script>
+  <script>
+    async function load() {
+      try {
+        const res = await fetch(`${API_URL}/api/sweets`);
+        const sweets = await res.json();
+        const el = document.getElementById('content');
+        if (!sweets.length) { el.innerHTML = '<p class="msg">Nuk ka ëmbëlsira.</p>'; return; }
+        el.innerHTML = `<table>
+          <thead><tr><th>#</th><th>Emri</th><th>Kategoria</th><th>Çmimi</th><th>Stoku</th><th>Përshkrimi</th><th>Veprimet</th></tr></thead>
+          <tbody>${sweets.map(s => `
+            <tr>
+              <td>${s.id}</td><td><strong>${s.name}</strong></td>
+              <td><span class="badge">${s.category}</span></td>
+              <td class="price">${s.price} L</td><td>${s.stock}</td><td>${s.description}</td>
+              <td>
+                <a href="edit-sweet.html?id=${s.id}" class="btn btn-edit">✏️ Ndrysho</a>
+                <button class="btn btn-del" onclick="del(${s.id})">🗑️ Fshij</button>
+              </td>
+            </tr>`).join('')}
+          </tbody></table>`;
+      } catch { document.getElementById('content').innerHTML = '<p class="msg">⚠️ Nuk u lidh me API-n.</p>'; }
+    }
+    async function del(id) {
+      if (!confirm('Fshij këtë ëmbëlsirë?')) return;
+      await fetch(`${API_URL}/api/sweets/${id}`, { method: 'DELETE' });
+      load();
+    }
+    load();
+  </script>
+</body>
+</html>
